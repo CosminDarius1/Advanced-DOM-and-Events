@@ -295,7 +295,7 @@ const sectionObserver = new IntersectionObserver(revealSection, {
 
 allSections.forEach(function (section) {
   sectionObserver.observe(section);
-  section.classList.add('section--hidden');
+  // section.classList.add('section--hidden');
 });
 
 //Lazy loading images
@@ -324,4 +324,99 @@ const imgObserver = new IntersectionObserver(loadImg, {
 
 imgTargets.forEach(img => imgObserver.observe(img));
 
+// * _ => convention of the throwaway variable, when we don't need an argument we can use _ to point that we will not use that argument
 // Slider Component
+const slides = document.querySelectorAll('.slide');
+const btnLeft = document.querySelector('.slider__btn--left');
+const btnRight = document.querySelector('.slider__btn--right');
+let currentSlide = 0;
+const maxSlide = slides.length;
+const dotContainer = document.querySelector('.dots');
+
+// const slider = document.querySelector('.slider');
+// slider.style.transform = 'scale(0.5) translateX(-500px)';
+// slider.style.overflow = 'visible';
+
+// Functions
+
+const createDots = function () {
+  slides.forEach(function (_, i) {
+    dotContainer.insertAdjacentHTML(
+      'beforeend',
+      `<button class = "dots_dot data-slide = ${i}"><button>`
+    );
+  });
+};
+createDots();
+
+const activateDot = function (slide) {
+  document
+    .querySelectorAll('dots__dot')
+    .forEach(dot => dot.classList.remove('dots__dot--active'));
+  document
+    .querySelector(`.dots__dot[data-slide="${slide}"]`)
+    .classList.add('dots__dot--active');
+};
+activateDot(0);
+
+const goToSlide = function (slide) {
+  slides.forEach(
+    (s, i) => (s.style.transform = `translateX(${100 * (i - slide)}%)`)
+  );
+};
+
+goToSlide(0);
+activateDot(currentSlide);
+//Next Slide
+
+const nextSlide = function () {
+  if (currentSlide === maxSlide - 1) {
+    currentSlide = 0;
+  } else {
+    currentSlide++;
+  }
+
+  goToSlide(currentSlide);
+};
+
+const prevSlide = function () {
+  if (currentSlide === 0) {
+    currentSlide = maxSlide - 1;
+  } else {
+    currentSlide--;
+  }
+
+  goToSlide(currentSlide);
+};
+
+btnRight.addEventListener('click', nextSlide);
+btnLeft.addEventListener('click', prevSlide);
+
+document.addEventListener('keydown', function (e) {
+  console.log(e);
+  if (e.key === 'ArrowLeft') prevSlide();
+  e.key === 'ArrowRight' && nextSlide();
+});
+
+dotContainer.addEventListener('click', function (e) {
+  if (e.target.classList.contains('dots__dot')) {
+    const slide = e.target.dataset.slide;
+    goToSlide(slide);
+    activateDot(slide);
+  }
+});
+
+// Lifecycle DOM
+
+document.addEventListener('DOMContentLoaded', function (e) {
+  console.log('HTML parsed and DOM tree built', e);
+});
+
+window.addEventListener('load', function (e) {
+  console.log('Page fully loaded', e);
+});
+// window.addEventListener('beforeunload', function (e) {
+//   e.preventDefault();
+//   console.log(e);
+//   e.returnValue = '';
+// });
